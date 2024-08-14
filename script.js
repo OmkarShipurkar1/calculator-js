@@ -36,54 +36,110 @@ const divide = function (a, b) {
 document.querySelector(".display").value = "";
 
 const operate = (firstNum, secondNum, operator) => {
-  console.log(firstNum, secondNum, operator);
+  console.log(firstNum, operator, secondNum);
   if (operator === "+") return add(firstNum, secondNum);
   if (operator === "-") return subtract(firstNum, secondNum);
   if (operator === "*") return multiply(firstNum, secondNum);
   if (operator === "/") return divide(firstNum, secondNum);
 };
 
-clearBtn.addEventListener(
-  "click",
-  () => (
-    (display.value = ""),
-    (firstNum = 0),
-    (secondNum = 0)((calculations.textContent = ""))((operator = ""))
-  )
-);
+let isFirst = true;
+
+clearBtn.addEventListener("click", () => {
+  display.value = "";
+  firstNum = 0;
+  secondNum = 0;
+  // operator = "";
+  isFirst = true;
+  calculations.innerHTML = "";
+  clicked = false;
+
+  firstDot = true;
+  secondDot = true;
+});
+
+let clicked = false;
 
 numBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    if (
-      display.value == "+" ||
-      display.value == "-" ||
-      display.value == "*" ||
-      display.value == "/"
-    ) {
-      display.value = "";
+  btn.addEventListener("click", (e) => {
+    calculations.innerHTML += btn.innerHTML;
+    if (isFirst) {
+      firstNum += btn.innerHTML;
+    } else {
+      secondNum += btn.innerHTML;
+      clicked = true;
     }
-    display.value += btn.innerHTML;
   });
 });
 
-let isFirst = true;
-
 operatorBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
-    if (isFirst) {
-      firstNum = Number(display.value);
-      isFirst = false;
-    } else {
-      secondNum = Number(display.value);
-    }
-    display.value = "";
-    operator = btn.innerHTML;
+    isFirst = false;
+    if (clicked) {
+      if (firstNum === "0" || (secondNum === "0" && operator === "/")) {
+        alert("Cannot divide by zero");
+      }
 
-    firstNum = operate(firstNum, secondNum, operator);
+      if ((firstNum === "00" || secondNum === "00") && operator === "/") {
+        alert("cannot divide by zero");
+        display.value = "Cannot Divide By Zero";
+      } else {
+        firstNum = operate(Number(firstNum), Number(secondNum), operator);
+        secondNum = 0;
+        display.value = firstNum;
+      }
+    }
+
+    // if (operator === "*") {
+    //   secondNum = 1;
+    // } else {
+    //   secondNum = 0;
+    // }
+    operator = btn.innerHTML;
+    calculations.innerHTML += operator;
   });
 });
 
 answerBtn.addEventListener("click", () => {
-  const answer = operate(firstNum, secondNum, operator);
-  console.log(answer);
+  if ((firstNum === "00" || secondNum === "00") && operator === "/") {
+    alert("cannot divide by zero");
+    display.value = "Cannot Divide By Zero";
+  } else {
+    firstNum = operate(Number(firstNum), Number(secondNum), operator);
+    if (operator === "*" || operator === "/") {
+      secondNum = 1;
+    } else {
+      secondNum = 0;
+    }
+    // secondNum = 0;
+    // display.value = operate(Number(firstNum), Number(secondNum), operator);
+    display.value = firstNum;
+  }
+});
+
+dotBtn.addEventListener("click", () => {
+  if (isFirst) {
+    if (!firstNum.includes(".")) {
+      firstNum += ".";
+      calculations.innerHTML += ".";
+    }
+  } else {
+    if (!secondNum.includes(".")) {
+      secondNum += ".";
+      clicked = true;
+      calculations.innerHTML += ".";
+    }
+  }
+});
+
+modulo.addEventListener("click", () => {
+  if (isFirst) {
+    firstNum *= 0.01;
+    calculations.innerHTML = "";
+    calculations.innerHTML = firstNum;
+  } else {
+    secondNum *= 0.01;
+    calculations.innerHTML = secondNum;
+    clicked = true;
+  }
 });
